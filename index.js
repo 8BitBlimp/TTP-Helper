@@ -5,9 +5,6 @@ const config = require('./config.json')
 const wrong = ["me", "i", "mine"];
 const right = ["us", "we", "our"];
 
-
-
-
 const bot = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildPresences] })
 bot.commands = new Collection()
 
@@ -60,25 +57,18 @@ bot.on('guildMemberAdd', async member => {
     let welcomeEmbed = new EmbedBuilder()
         .setTitle(`${member.user.tag} just joined!`)
         .setThumbnail(config.serverIcon)
-        .setDescription(`Welcome to Tax The Poor (TTP)! You don't own your money, we own your money!`)
+        .setDescription(`Welcome to Tax The Poor (TTP)! It's not your money, it's our money!`)
         .setColor('#FFFF00.')
-    bot.guild.channels.fetch(config.joinChannel).then(c => {
-        c.send(welcomeEmbed)
+    bot.channels.fetch(config.joinChannel).then(c => {
+        c.send({ embeds: [welcomeEmbed] })
     })
 })
 
 bot.on('presenceUpdate', async (oldPresence, newPresence) => {
 
-
-    // cache messages with slash command, clear cache on startup, read cache on presence update.
-
     if(!newPresence.activities && !oldPresence.activities) return
     
-    const haha = bot.channels.fetch(config.channel)
-    const pain = await haha.messages.fetch()
-
     const c = bot.channels.fetch(config.dChannel).then(c => {
-        
         
 
         try {
@@ -86,22 +76,14 @@ bot.on('presenceUpdate', async (oldPresence, newPresence) => {
             let newOBJ = Object.values(newPresence.activities)
             let oldName = oldOBJ[0]
             let newName = newOBJ[0]
-        
 
-        
+            if(!newName == config.game && !oldName == config.game) return
+            if(newPresence.user.bot) return
+                    
+            c.send(`User: ${newPresence.user.username}\nNew Presence: ${newName}\nOld Presence: ${oldName}`)
+
+                
             
-            if(newName == config.game || oldName == config.game) {
-                if(!newPresence.user.bot) {
-                    
-
-                    c.send(`User: ${newPresence.username}\nNew Presence: ${newName} \nOld Presence: ${oldName}`)
-                    
-                    
-
-                    
-                    
-                }
-            }
         }catch(error) {
             console.error(error)
             console.log(newPresence.user.username)

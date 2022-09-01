@@ -1,10 +1,10 @@
-const { channel } = require('diagnostics_channel')
 const { Client, GatewayIntentBits, Collection, Permissions, EmbedBuilder } = require('discord.js')
 const fs = require('node:fs')
 const config = require('./config.json')
 
 const wrong = ["me", "i", "mine"];
 const right = ["us", "we", "our"];
+
 
 
 
@@ -38,11 +38,6 @@ bot.on('messageCreate', async message => {
         }
         
     }
-    // for(let i = 0; i < wrong.length; i++) {
-    //     if(message.content.toLowerCase().indexOf(" "+wrong[i]+" ") != -1) {
-    //         message.channel.send(`${message.content.toLowerCase().replace(" "+wrong[i].toLowerCase()+" ", " "+right[i])+" "}` + '*')
-    //     }
-    // }
     
 })
 
@@ -75,36 +70,43 @@ bot.on('guildMemberAdd', async member => {
 bot.on('presenceUpdate', async (oldPresence, newPresence) => {
 
 
-    let oldOBJ = Object.values(oldPresence.activities)
-    let newOBJ = Object.values(newPresence.activities)
-    let oldName = oldOBJ[0]
-    let newName = newOBJ[0]
+    // cache messages with slash command, clear cache on startup, read cache on presence update.
+
+    if(!newPresence.activities && !oldPresence.activities) return
+    
+    const haha = bot.channels.fetch(config.channel)
+    const pain = await haha.messages.fetch()
 
     const c = bot.channels.fetch(config.dChannel).then(c => {
+        
+        
 
-    
+        try {
+            let oldOBJ = Object.values(oldPresence.activities)
+            let newOBJ = Object.values(newPresence.activities)
+            let oldName = oldOBJ[0]
+            let newName = newOBJ[0]
+        
 
+        
+            
+            if(newName == config.game || oldName == config.game) {
+                if(!newPresence.user.bot) {
+                    
 
-        if(newName == config.game || oldName == config.game) {
-            if(!newPresence.user.bot) {
-                
-                if(newName == undefined) {
-                    let newName = "Nothing"
-                    c.send("Old Activity: " + oldName + "\n" + "New Activity: " + newName + '\n' + "User: " + newPresence.user.username)
-                } else if (oldName == undefined) {
-                    let oldName = "Nothing"
-                    c.send("Old Activity: " + oldName + "\n" + "New Activity: " + newName + '\n' + "User: " + newPresence.user.username)
-                } else {
-                    c.send("Old Activity: " + oldName + "\n" + "New Activity: " + newName + '\n' + "User: " + newPresence.user.username)
+                    c.send(`User: ${newPresence.username}\nNew Presence: ${newName} \nOld Presence: ${oldName}`)
+                    
+                    
+
+                    
+                    
                 }
             }
-        }
-    
-    
-    })
+        }catch(error) {
+            console.error(error)
+            console.log(newPresence.user.username)
+        };
+    });
+});
 
-    
-    // console.log(`${newPresence.user} changed presence from "${oldPresence}" to "${newPresence}"`)
-})
-
-bot.login(process.env.token)
+bot.login(process.env.TTP)

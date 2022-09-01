@@ -1,8 +1,8 @@
 {
     "dChannel": "1011899735889682504",
-    "folders": ["utility"],
+    "folders": ["utility", "me"],
     "guildId": "1011380588118290524",
-    "clientId": "755366854964281354",
+    "clientId": "754326394867023903",
     "serverIcon": "https://cdn.discordapp.com/attachments/756998560842645515/1011376389796155422/Untitled-2.png",
     "joinChannel": "1011951018344448000",
     "banned": [

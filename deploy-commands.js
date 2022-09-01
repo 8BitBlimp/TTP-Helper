@@ -17,7 +17,7 @@ for(let i = 0; i < folders.length; i++) {
 }
 
 console.log(commands)
-const rest = new REST({ version: '9' }).setToken(process.env.token)
+const rest = new REST({ version: '9' }).setToken(process.env.TTP)
 
 rest.put(Routes.applicationGuildCommands(clientId, guildId), {body: commands })
     .then(() => console.log(`Succesfully registered application commands.`))

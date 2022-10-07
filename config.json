@@ -10,6 +10,7 @@
         "free speach",
         "democract"
     ],
-    "game": "Bloons TD 6"
+    "game": "Bloons TD 6",
+    "cooldown": "1500"
     
 }

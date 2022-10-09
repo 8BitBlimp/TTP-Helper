@@ -3,16 +3,6 @@ const fs = require('node:fs')
 const config = require('./config.json')
 const mongoose = require('mongoose');
 
-const Schema = mongoose.Schema
-
-const ObjectId = Schema.ObjectId;
-
-const repSchema = new Schema({
-    userID : {
-        type : mongoose.SchemaType.String,
-        required : true
-    }
-})
 const wrong = ["me", "i", "mine"];
 const right = ["us", "we", "our"];
 
@@ -33,9 +23,18 @@ for(let i = 0; i < config.folders.length; i++) {
     }
 }
 
+let event = require('./modules/user.js')
+// do a bot event for this
+// https://github.com/Sitarkjs/discord-mongodb-level-bot/blob/main/stark.js
+
+
 bot.once('ready', () => {
     console.log(`Logged in as ${bot.user.username}`)
+    mongoose.connect(`mongodb+srv://hollowhuu:<password>@discord-bot.5mmizai.mongodb.net/?retryWrites=true&w=majority`, {useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false}).then(c => console.log(`MongoDB connected!`)).catch(err => console.error(`Failed to connect to MongoDB!`));
+
 })
+
+
 
 bot.on('messageCreate', async message => {
     let person = message.author.id

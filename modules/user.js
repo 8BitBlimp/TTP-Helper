@@ -7,6 +7,8 @@ const userSchema = new Schema ({
     xp: { type: Number, default: 1},
     level: { type: Number, default: 1 },
     rep: { type: Number, default: 0 },
+    xpToLevel: { type: Number, default: 0 },
+    repCooldown: { type: Number, default: 0},
 }) 
 
 

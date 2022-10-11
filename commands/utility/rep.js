@@ -1,4 +1,9 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const User = require('../../modules/user.js')
+const { EmbedBuilder } = require('discord.js')
+const mongoose = require('mongoose');
+const ms = require('ms')
+require('../../index.js')
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -13,50 +18,36 @@ module.exports = {
                     { name: '+rep', value: '+rep'},
                     { name: '-rep', value: '-rep'},
                 )),
-	async execute(interaction, db) {
+	async execute(interaction) {
         // enter command here
-        let pain = false
-        let person = interaction.user.id
-        let person2 = interaction.options.getUser('user')
-        let newPerson = person2.id
+        let authorData = await User.findOne({ user: interaction.user.id })
+        let userData = await User.findOne({ user: interaction.options.getUser('user').id })
         let choice = interaction.options.getString('rep-type')
-        let fuck = await db.get(`${choice}_${person2}`)
-        let choice2 = '-rep'
-        if(choice == '-rep') fuck2 = '+rep'
-        let fuck2 = await db.get(`${choice2}_${person2}`)
-        
-        console.log(fuck)
-        if(fuck || fuck2){
+        let cooldown = 86400000
+        console.log('check 1')
 
-            if(fuck){
-                for(let i = 0; i < fuck.length; i++) {
-                    if(fuck[i] == person) {
-                        if(fuck2.has(person)){
-                            await interaction.reply('changing rep.')
-                            await db.delete
-                        }
-                        interaction.reply("You can't rep twice.")
-                        pain = true
-                        break
-                    }
-                }
+        if(authorData.repCooldown !== 0){
+            console.log('check 2')
+            timeOBJ = ms(cooldown - (Date.now() - authorData.repCooldown));
+            console.log(timeOBJ)
+            await interaction.reply(`Test`)
+        } else {
+            console.log('check 3')
+            if(choice == '+rep') {
+                userData.rep++
+                authorData.repCooldown = Date.now()
+                console.log(authorData.repCooldown)
+                userData.save().then(interaction.reply(`Gave ${interaction.options.getUser('user')} 1 social credit. They're now at ${userData.rep} social credit.`))
             }
-            
-            if(fuck2) {
-                for(let index = 0; index > fuck2.length; index++) {
-                    if(fuck2 == person) {
-                        interaction.reply("You can't rep twice.")
-                        pain = true
-                        break
-                    }
-                }
+            if(choice == '-rep') {
+                userData.rep--
+                authorData.repCooldown = Date.now()
+                console.log(authorData.cooldown)
+                userData.save().then(interaction.reply(`Removed 1 social credit from ${interaction.options.getUser('user')}. They're now at ${userData.rep} social credit.`))
             }
         }
-        
-        if (pain == false){
-            await db.push(`${choice}_${person2}`, `${person}`)
-            await interaction.reply(`Gave ${interaction.user} +1 rep`)
-        }
+
+
         
 	},
 };

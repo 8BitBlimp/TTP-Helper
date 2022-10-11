@@ -6,12 +6,11 @@ const mongoose = require('mongoose');
 const wrong = ["me", "i", "mine"];
 const right = ["us", "we", "our"];
 
+const User = require("./modules/user.js")
+
 const bot = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildPresences] })
 bot.commands = new Collection()
-bot.cooldown = new Collection()
-bot.config = {
-    cooldown: 15000
-}
+
 
 for(let i = 0; i < config.folders.length; i++) {
     console.log(config.folders[i])
@@ -30,17 +29,18 @@ let event = require('./modules/user.js')
 
 bot.once('ready', () => {
     console.log(`Logged in as ${bot.user.username}`)
-    mongoose.connect(`mongodb+srv://hollowhuu:<password>@discord-bot.5mmizai.mongodb.net/?retryWrites=true&w=majority`, {useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false}).then(c => console.log(`MongoDB connected!`)).catch(err => console.error(`Failed to connect to MongoDB!`));
+    mongoose.connect(`mongodb+srv://hollowhuu:4bAO4pUi4u1pya1t@discord-bot.5mmizai.mongodb.net/?retryWrites=true&w=majority`);
 
 })
-
-
+// password DELETE AFTER USE: 4bAO4pUi4u1pya1t
+// mongodb+srv://hollowhuu:4bAO4pUi4u1pya1t@discord-bot.5mmizai.mongodb.net/test
 
 bot.on('messageCreate', async message => {
     let person = message.author.id
     
     if(message.author.bot || message.channel.isDMBased()) return;
     
+    addLevel(message)
 
     for(let i = 0; i < config.banned.length; i++) {
         if (message.content.toLowerCase().includes(`${config.banned[i]}`)) {
@@ -64,7 +64,7 @@ bot.on('interactionCreate', async interaction => {
     if (!command) return;
 
     try {
-        await command.execute(interaction, mongoEconomy)
+        await command.execute(interaction)
     } catch (error) {
         console.error(error)
         await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
@@ -114,6 +114,28 @@ bot.on('presenceUpdate', async (oldPresence, newPresence) => {
     });
 });
 
+async function addLevel(message) {
 
+    let levelData = await User.findOne({ user: message.author.id })
+
+    if(!levelData) {
+        let newLevel = new User({
+            user: message.author.id
+        }).save();
+    } else {
+        let addedXP = Math.floor(Math.random() * (5 - 1) + 1);
+        levelData.xp += addedXP
+        levelData.save().then(data => {
+            if(data.xp >= data.xpToLevel) {
+                levelData.xp = 0;
+                levelData.level++;
+                levelData.xpToLevel += data.level * 123;
+                levelData.save().then(async _data => {
+                    message.reply(`${message.author} is now level ${_data.level}`);
+                })
+            }
+        })
+    }
+}
 
 bot.login(process.env.TTP)

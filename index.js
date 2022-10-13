@@ -18,7 +18,7 @@ for(let i = 0; i < config.folders.length; i++) {
     let folder = config.folders[i]
     for(let file of commandFiles) {
         let command = require(`./commands/${config.folders[i]}/${file}`)
-        bot.commands.set(command.data.name, command)
+        bot.commands.set(command.name, command)
     }
 }
 
